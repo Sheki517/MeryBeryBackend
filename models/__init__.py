@@ -1,5 +1,7 @@
-from app import db
-
+from .base import db
 from .user import User
-from .product import Product
-from .order import Order, OrderItem 
+from .farm import Farm
+from .variety import Variety
+from .inventory import Inventory
+
+__all__ = ['db', 'User', 'Farm', 'Variety', 'Inventory'] 
