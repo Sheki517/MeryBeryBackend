@@ -1,26 +1,27 @@
 from datetime import datetime
-from .base import db, farm_variety
+from .base import db
 
 class Farm(db.Model):
     __tablename__ = 'farms'
     
     id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(120), nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     phone_number = db.Column(db.String(20), nullable=False)
+    location = db.Column(db.String(120), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     # Relationships
-    varieties = db.relationship('Variety', secondary=farm_variety,
-                              backref=db.backref('farms', lazy='dynamic'),
-                              lazy='dynamic')
     inventory_items = db.relationship('Inventory', backref='farm', lazy='dynamic')
 
     def to_dict(self):
         return {
             'id': self.id,
+            'name': self.name,
             'email': self.email,
             'phone_number': self.phone_number,
+            'location': self.location,
             'created_at': self.created_at.isoformat(),
             'updated_at': self.updated_at.isoformat(),
             'varieties': [variety.to_dict() for variety in self.varieties],
@@ -28,11 +29,13 @@ class Farm(db.Model):
         }
 
     @classmethod
-    def create_farm(cls, email, phone_number):
+    def create_farm(cls, name, email, phone_number, location):
         """Create a new farm"""
         farm = cls(
+            name=name,
             email=email,
-            phone_number=phone_number
+            phone_number=phone_number,
+            location=location
         )
         db.session.add(farm)
         db.session.commit()
@@ -68,19 +71,3 @@ class Farm(db.Model):
             db.session.commit()
             return True
         return False
-
-    def add_variety(self, variety):
-        """Add a variety to the farm"""
-        if variety not in self.varieties:
-            self.varieties.append(variety)
-            db.session.commit()
-            return True
-        return False
-
-    def remove_variety(self, variety):
-        """Remove a variety from the farm"""
-        if variety in self.varieties:
-            self.varieties.remove(variety)
-            db.session.commit()
-            return True
-        return False 
