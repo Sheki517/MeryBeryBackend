@@ -3,9 +3,9 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_cors import CORS
 from config import Config
+from models import db, User, Farm, Variety, Inventory
 
 # Initialize Flask extensions
-db = SQLAlchemy()
 migrate = Migrate()
 
 def create_app(config_class=Config):
@@ -18,7 +18,7 @@ def create_app(config_class=Config):
     CORS(app)
 
     # Register blueprints
-    from routes import main
+    from routes.main import main
     app.register_blueprint(main)
 
     return app
